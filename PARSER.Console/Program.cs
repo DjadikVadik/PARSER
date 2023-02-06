@@ -22,6 +22,7 @@ internal class Program
         // хотел использовать Dapper, но было много коментариев, что нужен чистый SQL и решил писать на чистом ADO 
 
         // в конце выполнения программы я удаляю созданную базу, что бы можно было проверить код и не создавать ее у себя
+        // удаляю базу прямо здесь, что бы можно было закоментировать и посмотреть как создается база
 
         // создадим коекшен и конекшен стринг и попытаемся открыть соединение с базой данных
 
@@ -87,26 +88,34 @@ internal class Program
         var setings = new ParserSetings(client);
 
         // пытаемся спарсить данные в базу
-        if (await modelController.AddRangeAsync(new ModelEquipmentDomainParser(setings).GetModelDomains())) Console.WriteLine("Model loaded!!!");
-        if (await equipmentController.AddRangeAsync(new ModelEquipmentDomainParser(setings).GetEquipmentDomains())) Console.WriteLine("Equipment loaded!!!");
+        var listModels = new ModelEquipmentDomainParser(setings).GetModelDomains();
+        if (await modelController.AddRangeAsync(listModels)) Console.WriteLine("Model loaded!!!");
+
+        var listEquipment = new ModelEquipmentDomainParser(setings).GetEquipmentDomains();
+        if (await equipmentController.AddRangeAsync(listEquipment)) Console.WriteLine("Equipment loaded!!!");
 
         setings.URL = "https://www.ilcats.ru/toyota/?function=getComplectations&market=EU&model=671440&startDate=198308&endDate=198903";
 
-        if (await equipmentInfoController.AddRangeAsync(new EquipmentInfoDomainParser(setings).GetEquipmentInfos())) Console.WriteLine("EquipmentInfos loaded!!!");
+        var listEquipmentInfo = new EquipmentInfoDomainParser(setings).GetEquipmentInfos();
+        if (await equipmentInfoController.AddRangeAsync(listEquipmentInfo)) Console.WriteLine("EquipmentInfos loaded!!!");
 
         setings.URL = "https://www.ilcats.ru/toyota/?function=getGroups&market=EU&model=671440&modification=LN51L-KRA&complectation=001";
 
-        if (await groupController.AddRangeAsync(new GroupDomainParser(setings).GetGroupDomains())) Console.WriteLine("Group loaded!!!");
+        var listGroup = new GroupDomainParser(setings).GetGroupDomains();
+        if (await groupController.AddRangeAsync(listGroup)) Console.WriteLine("Group loaded!!!");
 
         setings.URL = "https://www.ilcats.ru/toyota/?function=getSubGroups&market=EU&model=671440&modification=LN51L-KRA&complectation=001&group=1";
 
-        if (await subgroupController.AddRangeAsync(new SubgroupDomainParser(setings).GetSubgroupDomains())) Console.WriteLine("Subgroup loaded!!!");
+        var listSubgroup = new SubgroupDomainParser(setings).GetSubgroupDomains();
+        if (await subgroupController.AddRangeAsync(listSubgroup)) Console.WriteLine("Subgroup loaded!!!");
 
         setings.URL = "https://www.ilcats.ru/toyota/?function=getParts&market=EU&model=671440&modification=LN51L-KRA&complectation=001&group=1&subgroup=0901";
 
-        if (await productController.AddRangeAsync(new ProductDomainParser(setings).GetProductDomains(), 1)) Console.WriteLine("Product loaded!!!");
+        var listProduct = new ProductDomainParser(setings).GetProductDomains();
+        if (await productController.AddRangeAsync(listProduct, 1)) Console.WriteLine("Product loaded!!!");
 
-        if (await imageController.AddSingleAsync(new ImageDomainParser(setings).GetImageDomain())) Console.WriteLine("Image loaded!!!");
+        var listImage = new ImageDomainParser(setings).GetImageDomain();
+        if (await imageController.AddSingleAsync(listImage)) Console.WriteLine("Image loaded!!!");
 
         // забераем данные с нашей базы
 
